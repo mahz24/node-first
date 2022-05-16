@@ -3,8 +3,6 @@ const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 const { ref, uploadBytes, getDownloadURL } = require('firebase/storage');
 
-// require('crypto').randomBytes(64).toString('hex')
-
 // Models
 const { User } = require('../models/user.model');
 const { Post } = require('../models/post.model');
@@ -18,10 +16,6 @@ const { storage } = require('../utils/firebase');
 dotenv.config({ path: './config.env' });
 
 const getAllUsers = catchAsync(async (req, res, next) => {
-  // SELECT * FROM users;
-  // Include the posts that each user has created
-  // Include the comments that each user has created
-  // Include the post in which the comment was made
   const users = await User.findAll({
     attributes: { exclude: ['password'] },
     include: [
