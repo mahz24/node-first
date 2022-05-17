@@ -12,6 +12,7 @@ const { Comment } = require('../models/comment.model');
 const { catchAsync } = require('../utils/catchAsync');
 const { AppError } = require('../utils/appError');
 const { storage } = require('../utils/firebase');
+const { user } = require('pg/lib/defaults');
 
 dotenv.config({ path: './config.env' });
 
@@ -27,8 +28,21 @@ const getAllUsers = catchAsync(async (req, res, next) => {
     ],
   });
 
+  //Map async: you will use this technique everytime that you need some async operations inside of an array
+  const usersPromises = users.map(async user => {
+    //Create firebase img ref and get the full path
+    const imageRef = ref(storage, user.profileImgUrl);
+    const url = await getDownloadURL(imageRef);
+
+    //Update user's profileImgUsr property
+    user.profileImgUrl = url;
+    return user;
+  });
+
+  const usersResolved = await Promise.all(usersPromises);
+
   res.status(200).json({
-    users,
+    users: usersResolved,
   });
 });
 
